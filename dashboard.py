@@ -1,4 +1,4 @@
-import streamlit as st
+            import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -11,6 +11,22 @@ st.set_page_config(page_title="Hardware Shop Sales Dashboard", layout="wide")
 st.title("🔨 Hardware Shop Sales Dashboard")
 st.markdown("#### 📍 Kenya | Sales Analytics 2021–2025")
 st.markdown("---")
+
+# Function to get product category
+def get_category(product):
+    categories = {
+        "Cement": "Building",
+        "Dumuzas": "Roofing",
+        "Nyumba Mabati": "Roofing",
+        "Timber": "Building",
+        "Paint": "Finishing",
+        "Nails": "Hardware",
+        "Pipes": "Plumbing",
+        "Taps": "Plumbing",
+        "Cables": "Electrical",
+        "Switches": "Electrical"
+    }
+    return categories.get(product, "Other")
 
 # Generate synthetic sales data
 def generate_sales_data():
@@ -60,7 +76,7 @@ def generate_sales_data():
             # Apply factors
             volume = int(volume * season * growth)
             
-            # Random cash or non-cash
+            # Random cash or non-cash (cash decreases over years)
             if year <= 2022:
                 is_cash = np.random.choice([True, False], p=[0.5, 0.5])
             else:
@@ -73,7 +89,7 @@ def generate_sales_data():
                 "Year": year,
                 "Month": date.strftime("%b"),
                 "Product": product,
-                "Category": self.get_category(product),
+                "Category": get_category(product),
                 "Volume": volume,
                 "Price": price,
                 "Sales": round(sales, 2),
@@ -82,21 +98,6 @@ def generate_sales_data():
     
     df = pd.DataFrame(data)
     return df
-
-def get_category(product):
-    categories = {
-        "Cement": "Building",
-        "Dumuzas": "Roofing",
-        "Nyumba Mabati": "Roofing",
-        "Timber": "Building",
-        "Paint": "Finishing",
-        "Nails": "Hardware",
-        "Pipes": "Plumbing",
-        "Taps": "Plumbing",
-        "Cables": "Electrical",
-        "Switches": "Electrical"
-    }
-    return categories.get(product, "Other")
 
 # Load data
 df = generate_sales_data()
@@ -166,7 +167,6 @@ with tab3:
     st.plotly_chart(fig5, use_container_width=True)
     
     st.subheader("Category Performance")
-    df["Category"] = df["Product"].apply(get_category)
     category_sales = df.groupby("Category")["Sales"].sum().reset_index()
     fig6 = px.pie(category_sales, values="Sales", names="Category", title="Sales by Category")
     st.plotly_chart(fig6, use_container_width=True)
@@ -204,6 +204,3 @@ st.download_button("Download as CSV", csv, "hardware_sales.csv", "text/csv")
 
 # Footer
 st.caption("Hardware Shop Dashboard | Data 2021-2025")
-
-
-
